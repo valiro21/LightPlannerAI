@@ -1,0 +1,4 @@
+﻿  Planner.cpp
+c:\users\valir\dropbox\fun\artificial inteligence\coursera ai planning\planner\planner.cpp(93): warning C4002: too many actual parameters for macro 'assert'
+c:\users\valir\dropbox\fun\artificial inteligence\coursera ai planning\planner\planner.cpp(94): warning C4002: too many actual parameters for macro 'assert'
+  Planner.vcxproj -> C:\Users\valir\Dropbox\Fun\Artificial Inteligence\Coursera AI Planning\Debug\Planner.lib
