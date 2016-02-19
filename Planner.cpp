@@ -108,12 +108,13 @@ planner::Planner<state_information, action_information>::run(
 		Planner<state_information, action_information>::possible_actions.push_back(action<action_information>(&(possible_actions->at(index))));
 	}
 
-	planner::state<state_information, action_information> *initial_state= new planner::state<state_information, action_information>(&initial_state_information);
+	planner::state<state_information, action_information> *initial_state =
+		new planner::state<state_information, action_information>(&initial_state_information);
 	initial_state->parent_state = NULL;
 	initial_state->action_from_parent = NULL;
 	initial_state->steps_from_initial_state = 0;
 
-	Planner::final_state_reached = SearchAllStates(initial_state, &final_state_information);
+	Planner::final_state_reached = SearchAllStates_AStar(initial_state, &final_state_information);
 
 	return Planner::getSolution(final_state_reached);
 }
