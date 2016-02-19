@@ -5,6 +5,9 @@
 #include <vector>
 
 namespace planner {
+	/*
+	Holder for user defined actions
+	*/
 	template <typename action_information>
 	struct action {
 		action_information *action_information_pointer;
@@ -18,6 +21,10 @@ namespace planner {
 		}
 	};
 
+	/*
+	Holds a reference to a state. Works like a simple list.
+	Works with user defined states.
+	*/
 	template <typename state_information, typename action_information>
 	struct state {
 		state<state_information, action_information>* parent_state;
@@ -34,6 +41,10 @@ namespace planner {
 		}
 	};
 
+	/*
+	A class used solely to hold a pointer to a state.
+	It overrides operator < for heuristic use.
+	*/
 	template <typename state_information, typename action_information>
 	class state_pointer {
 		state<state_information, action_information>* actual_state;
@@ -54,30 +65,74 @@ namespace planner {
 
 	template <typename state_information, typename action_information>
 	class Planner {
+		/*
+		User defined possible actions that can be applied on a state
+		*/
 		std::vector<action<action_information> > possible_actions;
+
+		/*
+		A hastable for visited states
+		*/
 		std::map<state_information, bool> states_map;
+
+		/*
+		Priority queue used to choose the next state to expand
+		*/
 		std::set<std::pair<int, state_pointer<state_information, action_information> > > states_queue;
+
+		/*
+		The final state reached after calling run function.
+		*/
 		state<state_information, action_information> *final_state_reached;
 
+		/*
+		Pointer to user defined heuristic function
+		*/
 		static int (*HeuristicApproximation)(state_information*);
+		
+		/*
+		Pointer to user defined state transition function.
+		This function takes a state and an action and return the resulting state
+		or a null pointer if the resulting state is invalid
+		*/
 		state_information* (*ApplyActionToState)(state_information*, action_information*);
 
+		/*
+		Add to states queue all possible new states that can be reached from a given state
+		*/
 		void AddNextPossibleStates(state<state_information, action_information>* current_state);
-		state<state_information, action_information>* SearchAllStates(
+
+		/*
+		Search through the possible states graph using A* method
+		*/
+		state<state_information, action_information>* SearchAllStates_AStar(
 			state<state_information, action_information> *initial_state,
 			state_information *final_state);
 
+		/*
+		Add a state to queue
+		*/
 		void InsertToQueue(state<state_information, action_information> *next_state);
 
+		/*
+		Returns a stl vector containing the path to the final state from an initial state.
+		This function should only be called internally.
+		*/
+		std::vector<std::pair<state_information*, action_information*> >*
+			planner::Planner<state_information, action_information>::getSolution(
+				state<state_information, action_information> *final_state);
+
 	public:
-		std::vector<std::pair<state_information*, action_information*> >* A_Star(
+		/*
+		Given an initial state and a state to find, and user defined state transition function and heuristic,
+		this function return the path found for the solution.
+		The return value is a stl vector of pairs of a state and the action used to reach that state from a previous one
+		*/
+		std::vector<std::pair<state_information*, action_information*> >* run(
 			state_information intial_state_information, state_information final_state_information,
 			std::vector<action_information> *possible_actions,
 			state_information*(*ApplyActionToState)(state_information*, action_information*),
 			int(*HeuristicApproximation)(state_information*)
 			);
-
-		std::vector<std::pair<state_information*, action_information*> >* planner::Planner<state_information, action_information>::getSolution(
-			state<state_information, action_information> *final_state);
 	};
 }

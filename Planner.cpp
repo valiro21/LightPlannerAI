@@ -1,9 +1,11 @@
 #include "Planner.h"
 #include <assert.h>
 
+//pointer to user defined heuristic function
 template<typename state_information, typename action_information>
 int (*planner::Planner<state_information, action_information>::HeuristicApproximation)(state_information*);
 
+//
 template<typename state_information, typename action_information>
 void planner::Planner<state_information, action_information>::AddNextPossibleStates(
 	state<state_information, action_information>* current_state)
@@ -45,6 +47,9 @@ void planner::Planner<state_information, action_information>::InsertToQueue(stat
 		);
 }
 
+/*
+compare two states using user-defined < operator
+*/
 template <typename state_information>
 bool compare(state_information *first_state, state_information *second_state) {
 	return *first_state < *second_state;
@@ -52,13 +57,14 @@ bool compare(state_information *first_state, state_information *second_state) {
 
 template <typename state_information, typename action_information>
 planner::state<state_information, action_information>*
-planner::Planner<state_information, action_information>::SearchAllStates(
+planner::Planner<state_information, action_information>::SearchAllStates_AStar(
 	state<state_information, action_information> *initial_state,
 	state_information *final_state) {
-
+	//initialisation
 	Planner::states_queue.clear ();
 	Planner::states_map.clear();
 
+	//add initial state to queue
 	InsertToQueue(initial_state);
 	Planner::states_map[*(initial_state->state_information_pointer)] = true;
 
@@ -83,7 +89,8 @@ planner::Planner<state_information, action_information>::SearchAllStates(
 }
 
 template <typename state_information, typename action_information>
-std::vector<std::pair<state_information*, action_information*> >* planner::Planner<state_information, action_information>::A_Star(
+std::vector<std::pair<state_information*, action_information*> >*
+planner::Planner<state_information, action_information>::run(
 	state_information initial_state_information, state_information final_state_information,
 	std::vector<action_information> *possible_actions,
 	state_information*(*ApplyActionToState)(state_information*, action_information*),
@@ -92,8 +99,10 @@ std::vector<std::pair<state_information*, action_information*> >* planner::Plann
 
 	assert(!compare<state_information>(&initial_state_information, &initial_state_information), "Bool opearator < must pe weak ordered!");
 	assert(compare<state_information>(&initial_state_information, &final_state_information) != compare<state_information>(&final_state_information, &initial_state_information), "Bool opearator < is invalid!");
+
 	this->HeuristicApproximation = HeuristicApproximation;
 	this->ApplyActionToState = ApplyActionToState;
+
 	Planner<state_information, action_information>::possible_actions.clear();
 	for (unsigned int index = 0; index < possible_actions->size(); index++) {
 		Planner<state_information, action_information>::possible_actions.push_back(action<action_information>(&(possible_actions->at(index))));
